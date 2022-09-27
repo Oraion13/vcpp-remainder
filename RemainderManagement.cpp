@@ -136,3 +136,27 @@ void RemainderManagement::writeRemaindersFromMap(unordered_map<int, Json::Value>
     // write the changes
     writeInAFile(getAFileToWrite(), root);
 }
+
+Json::Value RemainderManagement::getLatestRemainder() {
+    Json::Value remainders = readRemainder();
+    if (remainders.size() <= 0) return NULL;
+
+    Json::Value latest = remainders[0];
+    for (Json::Value::ArrayIndex i = 1; i != remainders.size(); i++) {
+        int minDate = strcmp(latest["date"].asCString(), remainders[i]["date"].asCString());
+        if (minDate == -1) {
+            continue;
+        }
+        if (minDate == 0) {
+            int minTime = strcmp(latest["time"].asCString(), remainders[i]["time"].asCString());
+
+            if (minTime == -1 || minTime == 0) {
+                continue;
+            }
+        }
+
+        latest = remainders[i];
+    }
+
+    return latest;
+}
