@@ -5,6 +5,7 @@
 
 #include "ValidIOHandlers.h"
 #include "RemainderManagement.h"
+#include "json/json.h"
 
 using namespace std;
 

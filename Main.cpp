@@ -13,5 +13,8 @@ int main() {
 
 	Remainder* remainder = new Remainder();
 
-	remainder->createEvent();
+	// remainder->createEvent();
+	// remainder->readEvent();
+	// remainder->deleteEvent();
+	remainder->updateEvent();
 }

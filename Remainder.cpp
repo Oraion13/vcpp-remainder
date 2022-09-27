@@ -28,26 +28,117 @@ string Remainder::getRecurrence(int key) {
 }
 
 void Remainder::createEvent() {
-	string summary{};
-	string description{};
-	string date{};
-	string time{};
-	string recur{NULL};
+	while (true) {
+		string summary{};
+		string description{};
+		string date{};
+		string time{};
+		string recur{ "ONCE" };
 
-	summary = validIOHandlers->getString("Enter a summary: ");
-	description = validIOHandlers->getString("Enter a description: ");
-	date = validIOHandlers->getDate();
-	time = validIOHandlers->getHourMinute();
+		summary = validIOHandlers->getString("Enter a summary: ");
+		description = validIOHandlers->getString("Enter a description: ");
+		date = validIOHandlers->getDate();
+		time = validIOHandlers->getHourMinute();
 
-	// display recurrence value
-	if (validIOHandlers->isY("Is a recursive event [Y/n]: ")) {
-		displayRecurrence();
+		// display recurrence value
+		if (validIOHandlers->isY("Is a recursive event [Y/n]: ")) {
+			displayRecurrence();
 
-		int key = validIOHandlers->getInt("Enter a RecurId [Number]: ");
-		if (key != 0) {
-		recur = getRecurrence(key);
+			int key = validIOHandlers->getInt("Enter a RecurId [Number]: ");
+			if (key != 0) {
+				recur = getRecurrence(key);
+			}
+		}
+
+		remainderManagement->addRemainder(summary, description, date, time, recur);
+
+		if (!validIOHandlers->isY("Continue adding remainders [Y/n]?: ")) {
+			break;
 		}
 	}
+}
 
-	remainderManagement->addRemainder(summary, description, date, time, recur);
+void Remainder::readEvent() {
+	remainderManagement->printRemainders(remainderManagement->readRemainder());
+}
+
+void Remainder::deleteEvent() {
+	while (true) {
+		cout << "Enter '0' to exit..." << endl;
+
+		unordered_map<int, Json::Value> remaindersMap = remainderManagement->getRemaindersInMap(
+			remainderManagement->readRemainder()
+		);
+		if (remaindersMap.size() == 0) {
+			cout << "No remainders found!" << endl;
+			break;
+		}
+
+		remainderManagement->printRemaindersInMap(remaindersMap);
+
+		int choice = validIOHandlers->getInt("Enter a Remainder Id to delete [Number / 0]: ");
+
+		if (choice == 0) {
+			break;
+		}
+
+		remaindersMap.erase(choice);
+		remainderManagement->writeRemaindersFromMap(remaindersMap);
+		cout << "Remainder deleted successfully!!" << endl;
+
+		if (!validIOHandlers->isY("Continue deleting [Y/n]?: ")) {
+			break;
+		}
+	}
+	
+}
+
+void Remainder::updateEvent() {
+	while (true) {
+		cout << "Enter '0' to exit..." << endl;
+
+		unordered_map<int, Json::Value> remaindersMap = remainderManagement->getRemaindersInMap(
+			remainderManagement->readRemainder()
+		);
+		remainderManagement->printRemaindersInMap(remaindersMap);
+
+		int choice = validIOHandlers->getInt("Enter a Remainder Id to update [Number / 0]: ");
+
+		if (choice == 0) {
+			break;
+		}
+
+		if (validIOHandlers->isY("Update remainder's summary [Y/n]?: ")) {
+			remaindersMap[choice]["summary"] = validIOHandlers->getString("Enter a summary: ");
+		}
+
+		if (validIOHandlers->isY("Update remainder's description [Y/n]?: ")) {
+			remaindersMap[choice]["description"] = validIOHandlers->getString("Enter a description: ");
+		}
+
+		if (validIOHandlers->isY("Update remainder's date [Y/n]?: ")) {
+			remaindersMap[choice]["date"] = validIOHandlers->getDate();
+		}
+
+		if (validIOHandlers->isY("Update remainder's time [Y/n]?: ")) {
+			remaindersMap[choice]["time"] = validIOHandlers->getHourMinute();
+		}
+
+		if (validIOHandlers->isY("Update remainder's recurrence [Y/n]?: ")) {
+			displayRecurrence();
+
+			int key = validIOHandlers->getInt("Enter a RecurId [Number]: ");
+			if (key != 0) {
+				remaindersMap[choice]["recurrence"] = getRecurrence(key);
+			}
+		}
+
+		remainderManagement->writeRemaindersFromMap(remaindersMap);
+		cout << "Remainder updated successfully!!" << endl;
+
+		if (!validIOHandlers->isY("Continue updating [Y/n]?: ")) {
+			break;
+		}
+
+	}
 }

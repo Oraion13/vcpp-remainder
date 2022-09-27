@@ -1,0 +1,20 @@
+{
+   "remainders" : [
+      {
+         "date" : "2022-11-12",
+         "description" : "1st",
+         "id" : "99ca83b9ccfc859a15828b419c727a64",
+         "recurrence" : "MONTHLY",
+         "summary" : "frst msg",
+         "time" : "04:43"
+      },
+      {
+         "date" : "2022-12-14",
+         "description" : "last",
+         "id" : "a427b180bb8570656675953d66446d3f",
+         "recurrence" : "YEARLY",
+         "summary" : "last msg",
+         "time" : "06:56"
+      }
+   ]
+}
