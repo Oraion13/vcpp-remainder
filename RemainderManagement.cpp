@@ -112,7 +112,7 @@ Json::Value RemainderManagement::readRemainder() {
 
     reader.parse(content, root);
     
-    return root["remainders"];
+    return root == NULL ? NULL : root["remainders"] ;
 }
 
 unordered_map<int, Json::Value> RemainderManagement::getRemaindersInMap(Json::Value remainders) {
@@ -126,9 +126,11 @@ unordered_map<int, Json::Value> RemainderManagement::getRemaindersInMap(Json::Va
 }
 
 void RemainderManagement::writeRemaindersFromMap(unordered_map<int, Json::Value> remaindersMap) {
+    cout << "inside write" << endl;
     Json::Value root;
 
     root["remainders"] = Json::Value(Json::arrayValue);
+    cout << remaindersMap.size() << endl;
     for (auto& remainder : remaindersMap)
     {
         root["remainders"].append(remainder.second);
@@ -141,6 +143,7 @@ Json::Value RemainderManagement::getLatestRemainder() {
     Json::Value remainders = readRemainder();
     if (remainders.size() <= 0) return NULL;
 
+    cout << "inside latest" << endl;
     Json::Value latest = remainders[0];
     for (Json::Value::ArrayIndex i = 1; i != remainders.size(); i++) {
         int minDate = strcmp(latest["date"].asCString(), remainders[i]["date"].asCString());
@@ -163,16 +166,21 @@ Json::Value RemainderManagement::getLatestRemainder() {
 
 void RemainderManagement::deleteOrModifyById(string id) {
     unordered_map<int, Json::Value> remaindersMap = getRemaindersInMap(readRemainder());
+    cout << "inside dlt" << endl;
 
     for (auto& remainder : remaindersMap)
     {
         if (strcmp(remainder.second["id"].asCString(), id.c_str()) == 0) {
+            cout << "dlt..." << endl;
             remaindersMap.erase(remainder.first);
+
+            // write in remainders.json file
+            writeRemaindersFromMap(remaindersMap);
 
             // to delete or make changes in the recurrence remainders
             /*
             if (strcmp(remainder.second["recurrence"].asCString(), "ONCE") == 0) {
-                
+
             }
             else {
                 string recurrence = remainder.second["recurrence"].asCString();
@@ -196,8 +204,5 @@ void RemainderManagement::deleteOrModifyById(string id) {
             */
         }
     }
-
-    // write in remainders.json file
-    writeRemaindersFromMap(remaindersMap);
 }
 

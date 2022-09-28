@@ -4,11 +4,15 @@ Json::Value Notifier::REMAINDER{};
 DWORD Notifier::TIMER{};
 
 void Notifier::setNotifier(Json::Value latestRemainder) {
-	REMAINDER = latestRemainder;
-
-	if (REMAINDER) {
+	cout << "inside set noti" << endl;
+	if (latestRemainder != NULL) {
+		cout << "setup" << endl;
+		REMAINDER = latestRemainder;
 		setSleepTimer(calculateSleepTImer());
 	}
+
+	// cout << REMAINDER << endl;
+	// cout << "timer: " << TIMER << endl;
 }
 
 int Notifier::getYear(string date) {
@@ -96,20 +100,31 @@ void Notifier::notifier() {
 	RemainderManagement remainderManagement;
 	while (true) {
 		// checks if a remainder is present
-		if (!REMAINDER) {
-			break;
+		if (REMAINDER == NULL) {
+			cout << "checking" << endl;
+			setNotifier(remainderManagement.getLatestRemainder());
+			if (REMAINDER == NULL) {
+				break;
+			}
 		}
-
+		TIMER = 0;
 		// sleep until the remainder occurs
 		Sleep(TIMER);
 
 		// display the popup
-		MessageBox(0, getSummary(), getDescription(), MB_OK | MB_ICONINFORMATION);
+		MessageBoxA(0, (LPCSTR) REMAINDER["summary"].asCString(), (LPCSTR) REMAINDER["description"].asCString(), MB_OK | MB_ICONINFORMATION);
 
 		// setup next remainder but before make sure to delete the current remainder
 		// create a method to delete event by ID
 		remainderManagement.deleteOrModifyById(REMAINDER["id"].asCString());
 
+		cout << "after delt" << endl;
+
+		REMAINDER = NULL;
 		setNotifier(remainderManagement.getLatestRemainder());
+		cout << "after setup bottom" << endl;
+		if (REMAINDER == NULL) {
+			break;
+		}
 	}
 }

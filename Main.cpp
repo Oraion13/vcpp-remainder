@@ -5,8 +5,8 @@
 #include <Windows.h>
 #include <iostream>
 
-int main() {
-	new Operations();
+//int main() {
+	//new Operations();
 	 
 	// RemainderManagement r;
 	// Json::Value latest = r.getLatestRemainder();
@@ -32,4 +32,4 @@ int main() {
 	cout << currentDate << endl;
 	cout << currentTime << endl;
 	*/
-}
+//}

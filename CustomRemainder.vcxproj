@@ -132,6 +132,7 @@
     <ClCompile Include="Notifier.cpp" />
     <ClCompile Include="Operations.cpp" />
     <ClCompile Include="Remainder.cpp" />
+    <ClCompile Include="RemainderMain.cpp" />
     <ClCompile Include="RemainderManagement.cpp" />
     <ClCompile Include="ValidIOHandlers.cpp" />
   </ItemGroup>
