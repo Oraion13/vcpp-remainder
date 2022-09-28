@@ -52,6 +52,9 @@ void Remainder::createEvent() {
 
 		remainderManagement->addRemainder(summary, description, date, time, recur);
 
+		// get the latest remainder and set notifier
+		Notifier::setNotifier(remainderManagement->getLatestRemainder());
+
 		if (!validIOHandlers->isY("Continue adding remainders [Y/n]?: ")) {
 			break;
 		}
@@ -85,6 +88,9 @@ void Remainder::deleteEvent() {
 		remaindersMap.erase(choice);
 		remainderManagement->writeRemaindersFromMap(remaindersMap);
 		cout << "Remainder deleted successfully!!" << endl;
+
+		// get the latest remainder and set notifier
+		Notifier::setNotifier(remainderManagement->getLatestRemainder());
 
 		if (!validIOHandlers->isY("Continue deleting [Y/n]?: ")) {
 			break;
@@ -135,6 +141,9 @@ void Remainder::updateEvent() {
 
 		remainderManagement->writeRemaindersFromMap(remaindersMap);
 		cout << "Remainder updated successfully!!" << endl;
+
+		// get the latest remainder and set notifier
+		Notifier::setNotifier(remainderManagement->getLatestRemainder());
 
 		if (!validIOHandlers->isY("Continue updating [Y/n]?: ")) {
 			break;

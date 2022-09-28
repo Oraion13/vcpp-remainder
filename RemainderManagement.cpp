@@ -160,3 +160,44 @@ Json::Value RemainderManagement::getLatestRemainder() {
 
     return latest;
 }
+
+void RemainderManagement::deleteOrModifyById(string id) {
+    unordered_map<int, Json::Value> remaindersMap = getRemaindersInMap(readRemainder());
+
+    for (auto& remainder : remaindersMap)
+    {
+        if (strcmp(remainder.second["id"].asCString(), id.c_str()) == 0) {
+            remaindersMap.erase(remainder.first);
+
+            // to delete or make changes in the recurrence remainders
+            /*
+            if (strcmp(remainder.second["recurrence"].asCString(), "ONCE") == 0) {
+                
+            }
+            else {
+                string recurrence = remainder.second["recurrence"].asCString();
+
+                if (strcmp(recurrence.c_str(), "HOURLY") == 0) {
+
+                }
+                else if (strcmp(recurrence.c_str(), "DAILY") == 0) {
+
+                }
+                else if (strcmp(recurrence.c_str(), "WEEKLY") == 0) {
+
+                }
+                else if (strcmp(recurrence.c_str(), "MONTHLY") == 0) {
+
+                }
+                else if (strcmp(recurrence.c_str(), "YEARLY") == 0) {
+
+                }
+            }
+            */
+        }
+    }
+
+    // write in remainders.json file
+    writeRemaindersFromMap(remaindersMap);
+}
+

@@ -6,6 +6,7 @@
 #include "ValidIOHandlers.h"
 #include "RemainderManagement.h"
 #include "json/json.h"
+#include "Notifier.h"
 
 using namespace std;
 

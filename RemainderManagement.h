@@ -19,6 +19,7 @@ public:
 	unordered_map<int, Json::Value> getRemaindersInMap(Json::Value remainders);
 	void writeRemaindersFromMap(unordered_map<int, Json::Value> remaindersMap);
 	Json::Value getLatestRemainder();
+	void deleteOrModifyById(string id);
 
 private:
 	string FILE_NAME = "remainders.json";

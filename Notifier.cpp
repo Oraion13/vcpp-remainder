@@ -1,5 +1,8 @@
 #include "Notifier.h"
 
+Json::Value Notifier::REMAINDER{};
+DWORD Notifier::TIMER{};
+
 void Notifier::setNotifier(Json::Value latestRemainder) {
 	REMAINDER = latestRemainder;
 
@@ -45,19 +48,19 @@ DWORD Notifier::calculateSleepTImer() {
 	DWORD timer{};
 
 	// years
-	timer += ((getYear(remainderDate) - getYear(currentDate)) * 8760 * 60 * 60 * 60 * 1000);
+	timer += (DWORD) ((getYear(remainderDate) - getYear(currentDate)) * 31556952000);
 
 	// month
-	timer += ((getMonth(remainderDate) - getMonth(currentDate)) * 730.001 * 60 * 60 * 60 * 1000);
+	timer += (DWORD) ((getMonth(remainderDate) - getMonth(currentDate)) * 2629800000);
 
 	// days
-	timer += ((getDay(remainderDate) - getYear(currentDate)) * 1 * 60 * 60 * 60 * 1000);
+	timer += (DWORD) ((getDay(remainderDate) - getDay(currentDate)) * 86400000);
 
 	// hours
-	timer += ((getHour(remainderTime) - getHour(currentTime)) * 60 * 60 * 1000);
+	timer += (DWORD) ((getHour(remainderTime) - getHour(currentTime)) * 3600000);
 
 	// minutes
-	timer += ((getMinute(remainderTime) - getMinute(remainderTime)) * 60 * 1000);
+	timer += (DWORD) ((getMinute(remainderTime) - getMinute(currentTime)) * 60000);
 
 	return timer < 0 ? 0 : timer;
 }
@@ -103,8 +106,9 @@ void Notifier::notifier() {
 		// display the popup
 		MessageBox(0, getSummary(), getDescription(), MB_OK | MB_ICONINFORMATION);
 
-		// setup next remainder but before make sure to delete the current event
+		// setup next remainder but before make sure to delete the current remainder
 		// create a method to delete event by ID
+		remainderManagement.deleteOrModifyById(REMAINDER["id"].asCString());
 
 		setNotifier(remainderManagement.getLatestRemainder());
 	}

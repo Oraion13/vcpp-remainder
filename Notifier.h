@@ -11,23 +11,23 @@ using namespace std;
 class Notifier
 {
 public:
-	void setNotifier(Json::Value latestRemainder);
-	void notifier();
+	static void setNotifier(Json::Value latestRemainder);
+	static void notifier();
 	
 private:
-	Json::Value REMAINDER;
-	DWORD TIMER;
+	static Json::Value REMAINDER;
+	static DWORD TIMER;
 
-	DWORD calculateSleepTImer();
-	void setSleepTimer(DWORD timerMilli);
+	static DWORD calculateSleepTImer();
+	static void setSleepTimer(DWORD timerMilli);
 
-	int getYear(string date);
-	int getMonth(string date);
-	int getDay(string date);
-	int getHour(string time);
-	int getMinute(string time);
+	static int getYear(string date);
+	static int getMonth(string date);
+	static int getDay(string date);
+	static int getHour(string time);
+	static int getMinute(string time);
 
-	LPCWSTR getSummary();
-	LPCWSTR getDescription();
+	static LPCWSTR getSummary();
+	static LPCWSTR getDescription();
 };
 

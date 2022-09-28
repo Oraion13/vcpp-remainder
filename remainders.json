@@ -17,12 +17,12 @@
          "time" : "06:56"
       },
       {
-         "date" : "2022-11-12",
-         "description" : "best",
-         "id" : "a427b180bb8571656675953d66446d3f",
-         "recurrence" : "YEARLY",
-         "summary" : "best msg",
-         "time" : "03:56"
+         "date" : "2022-09-29",
+         "description" : "remdr",
+         "id" : "6075d44a23371344747a17bb769ced56",
+         "recurrence" : "ONCE",
+         "summary" : "new rem",
+         "time" : "00:30"
       }
    ]
 }
