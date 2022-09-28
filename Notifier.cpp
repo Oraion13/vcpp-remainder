@@ -100,10 +100,12 @@ void Notifier::notifier() {
 	RemainderManagement remainderManagement;
 	while (true) {
 		// checks if a remainder is present
-		if (REMAINDER == NULL) {
+		cout << "Inside remainder" << endl;
+		cout << REMAINDER << endl;
+		if (!REMAINDER) {
 			cout << "checking" << endl;
 			setNotifier(remainderManagement.getLatestRemainder());
-			if (REMAINDER == NULL) {
+			if (!REMAINDER) {
 				break;
 			}
 		}
@@ -123,7 +125,7 @@ void Notifier::notifier() {
 		REMAINDER = NULL;
 		setNotifier(remainderManagement.getLatestRemainder());
 		cout << "after setup bottom" << endl;
-		if (REMAINDER == NULL) {
+		if (!REMAINDER) {
 			break;
 		}
 	}
