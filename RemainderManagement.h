@@ -26,7 +26,7 @@ public:
 	string giveMeContents();
 
 private:
-	string FILE_NAME = "remainders.json";
+	string FILE_NAME = "C:\\CustomRemainder\\remainders.json";
 
 	ofstream getAFileToWrite();
 

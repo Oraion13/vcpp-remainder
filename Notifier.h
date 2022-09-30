@@ -14,6 +14,7 @@ class Notifier
 {
 public:
 	static bool FLAG;
+	static bool STOP_FLAG;
 
 	static void setNotifier(Json::Value latestRemainder);
 	static void notifier();

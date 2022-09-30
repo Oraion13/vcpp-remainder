@@ -3,6 +3,7 @@
 Json::Value Notifier::REMAINDER{};
 DWORD Notifier::TIMER{};
 bool Notifier::FLAG{};
+bool Notifier::STOP_FLAG{0};
 HANDLE Notifier::ghMutex = CreateMutex(
 	NULL,              // default security attributes
 	FALSE,             // initially not owned
@@ -11,13 +12,13 @@ HANDLE Notifier::ghMutex = CreateMutex(
 ofstream Notifier::getAFileToWrite() {
 	ofstream fileToWorkWith;
 
-	fileToWorkWith.open("log.txt", std::ios_base::app);
+	fileToWorkWith.open("C:\\CustomRemainder\\log.txt", std::ios_base::app);
 
 	// If file does not exist, Create new file
 	if (!fileToWorkWith)
 	{
 		// cout << "Cannot open file, file does not exist. Creating new file..";
-		fileToWorkWith.open("log.txt", std::ios_base::app);
+		fileToWorkWith.open("C:\\CustomRemainder\\log.txt", std::ios_base::app);
 	}
 	else
 	{    // use existing file
@@ -49,7 +50,7 @@ void Notifier::writeLog(ofstream file, string txt) {
 }
 
 void Notifier::setNotifier(Json::Value latestRemainder) {
-	writeLog(getAFileToWrite(), "Setting a new remainder");
+	writeLog(getAFileToWrite(), "Setting up the latest remainder");
 	if (latestRemainder != NULL) {
 		//cout << "setting up notification..." << endl;
 		REMAINDER = latestRemainder;
@@ -108,9 +109,13 @@ bool Notifier::isAPastReminder() {
 	if ((getYear(remainderDate) <= getYear(currentDate))
 		&& (getMonth(remainderDate) <= getMonth(currentDate))
 		&& (getDay(remainderDate) <= getDay(currentDate))
-		&& (getHour(remainderTime) <= getHour(currentTime))
-		&& (getMinute(remainderTime) <= getMinute(currentTime))) {
-		return true;
+		) {
+		if ((getHour(remainderTime) - getHour(currentTime)) < 0) {
+			return true;
+		}
+		if (((getHour(remainderTime) - getHour(currentTime)) == 0) && ((getMinute(remainderTime) - getMinute(currentTime)) <= 0)) {
+			return true;
+		}
 	}
 
 	return false;
@@ -141,23 +146,23 @@ DWORD Notifier::calculateSleepTImer() {
 	writeLog(getAFileToWrite(), "Timer...:");
 	// years
 	timer += (DWORD) ((getYear(remainderDate) - getYear(currentDate)) * 31556952000);
-	writeLog(getAFileToWrite(), "Year: " + timer);
+	writeLog(getAFileToWrite(), "Year: " + to_string(timer));
 	// month
 	timer += (DWORD) ((getMonth(remainderDate) - getMonth(currentDate)) * 2629800000);
-	writeLog(getAFileToWrite(), "Month: " + timer);
+	writeLog(getAFileToWrite(), "Month: " + to_string(timer));
 	// days
 	timer += (DWORD) ((getDay(remainderDate) - getDay(currentDate)) * 86400000);
-	writeLog(getAFileToWrite(), "Day: " + timer);
+	writeLog(getAFileToWrite(), "Day: " + to_string(timer));
 	// hours
 	timer += (DWORD) ((getHour(remainderTime) - getHour(currentTime)) * 3600000);
-	writeLog(getAFileToWrite(), "Hr: " + timer );
+	writeLog(getAFileToWrite(), "Hr: " + to_string(timer));
 	// minutes
 	timer += (DWORD) ((getMinute(remainderTime) - getMinute(currentTime)) * 60000);
-	writeLog(getAFileToWrite(), "Min: " + timer );
+	writeLog(getAFileToWrite(), "Min: " + to_string(timer));
 
 	// seconds
 	timer -= (DWORD)(getSecond(currentTime) * 1000);
-	writeLog(getAFileToWrite(), "Sec: -" + timer);
+	writeLog(getAFileToWrite(), "Sec: -" + to_string(timer));
 
 	return timer < 0 ? 0 : timer;
 }
@@ -199,7 +204,7 @@ void Notifier::notifier() {
 	RemainderManagement* remainderManagement = new RemainderManagement();
 	setNotifier(remainderManagement->getLatestRemainder());
 
-	while (true) {
+	while (true && !STOP_FLAG) {
 		// empty remainder exit flag
 		FLAG = false;
 		// checks if a remainder is present
@@ -218,7 +223,7 @@ void Notifier::notifier() {
 		writeLog(getAFileToWrite(), "Remainder present...waiting for timer");
 
 		writeLog(getAFileToWrite(), jsonToString(REMAINDER));
-		writeLog(getAFileToWrite(), "Timer: " + TIMER);
+		writeLog(getAFileToWrite(), "Timer: " + to_string(TIMER));
 
 		//TIMER = 0;
 		// sleep until the remainder occurs
@@ -240,7 +245,7 @@ void Notifier::fileUpdateNotifier() {
 	RemainderManagement remainderManagement;
 	string oldContents = remainderManagement.giveMeContents();
 
-	while (true) {
+	while (true && !STOP_FLAG) {
 		// periodic
 		writeLog(getAFileToWrite(), "Periodic check...");
 		Sleep(5000);

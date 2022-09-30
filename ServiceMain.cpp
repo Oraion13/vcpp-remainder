@@ -1,5 +1,6 @@
 #include "Sample.h"
 #include "RemainderMain.h"
+#include "Notifier.h"
 
 #include <windows.h>
 #include <tchar.h>
@@ -212,6 +213,31 @@ VOID SvcInit(DWORD dwArgc, LPTSTR* lpszArgv)
     ReportSvcStatus(SERVICE_RUNNING, NO_ERROR, 0);
 
     // TO_DO: Perform work until service stops.
+
+    // Create files and folder
+    const wchar_t* OutputDir = L"C:\\CustomRemainder";
+    const wchar_t* remainderFile = L"remainders.json";
+    const wchar_t* logFile = L"log.txt";
+
+    if (CreateDirectory((LPWSTR)OutputDir, NULL) ||
+        ERROR_ALREADY_EXISTS == GetLastError())
+    {
+        HANDLE h = CreateFile( (LPWSTR) remainderFile,    // name of the file
+            GENERIC_WRITE, // open for writing
+            0,             // sharing mode, none in this case
+            0,             // use default security descriptor
+            CREATE_ALWAYS, // overwrite if exists
+            FILE_ATTRIBUTE_NORMAL,
+            0);
+        HANDLE logfile = CreateFile((LPWSTR) logFile,    // name of the file
+            GENERIC_WRITE, // open for writing
+            0,             // sharing mode, none in this case
+            0,             // use default security descriptor
+            CREATE_ALWAYS, // overwrite if exists
+            FILE_ATTRIBUTE_NORMAL,
+            0);
+    }
+
     RemainderMain::remainderMain();
     while (1)
     {
@@ -282,6 +308,7 @@ VOID WINAPI SvcCtrlHandler(DWORD dwCtrl)
         ReportSvcStatus(SERVICE_STOP_PENDING, NO_ERROR, 0);
 
         // Signal the service to stop.
+        Notifier::STOP_FLAG = 1;
 
         SetEvent(ghSvcNotifierEvent);
         ReportSvcStatus(gSvcStatus.dwCurrentState, NO_ERROR, 0);
