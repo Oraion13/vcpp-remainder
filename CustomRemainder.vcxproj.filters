@@ -39,6 +39,9 @@
     <ClCompile Include="RemainderMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ServiceMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Remainder.h">
@@ -62,5 +65,14 @@
     <ClInclude Include="Notifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\ServiceEg\Sample.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RemainderMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

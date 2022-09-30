@@ -20,14 +20,16 @@ public:
 	void writeRemaindersFromMap(unordered_map<int, Json::Value> remaindersMap);
 	Json::Value getLatestRemainder();
 	void deleteOrModifyById(string id);
+	bool isFileUpdated(string oldContents);
+	string readAFile(ifstream file);
+	ifstream getAFileToRead();
+	string giveMeContents();
 
 private:
 	string FILE_NAME = "remainders.json";
 
-	ifstream getAFileToRead();
 	ofstream getAFileToWrite();
 
-	string readAFile(ifstream file);
 	void writeInAFile(ofstream file, Json::Value content);
 
 	string getUUID(size_t len);

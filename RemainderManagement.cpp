@@ -27,12 +27,12 @@ ifstream RemainderManagement::getAFileToRead() {
     // If file does not exist, Create new file
     if (!fileToWorkWith)
     {
-        cout << "Cannot open file, file does not exist. Creating new file..";
+        //cout << "Cannot open file, file does not exist. Creating new file..";
         fileToWorkWith.open(FILE_NAME, fstream::in | fstream::trunc);
     }
     else
     {    // use existing file
-        cout << "success " << FILE_NAME << " found. \n";
+        //cout << "success " << FILE_NAME << " found. \n";
     }
 
     return fileToWorkWith;
@@ -74,6 +74,10 @@ void RemainderManagement::writeInAFile(ofstream file, Json::Value content) {
 
     file << writer.write(content);
     file.close();
+}
+
+string RemainderManagement::giveMeContents() {
+    return readAFile(getAFileToRead());
 }
 
 void RemainderManagement::addRemainder(string summary, string description, string date, string time, string recur) {
@@ -130,20 +134,22 @@ void RemainderManagement::writeRemaindersFromMap(unordered_map<int, Json::Value>
     Json::Value root;
 
     root["remainders"] = Json::Value(Json::arrayValue);
-    cout << remaindersMap.size() << endl;
+    //cout << remaindersMap.size() << endl;
     for (auto& remainder : remaindersMap)
     {
         root["remainders"].append(remainder.second);
     }
     // write the changes
+    cout << "writing changes" << endl;
     writeInAFile(getAFileToWrite(), root);
+    cout << "written" << endl;
 }
 
 Json::Value RemainderManagement::getLatestRemainder() {
     Json::Value remainders = readRemainder();
     if (remainders.size() <= 0) return NULL;
 
-    cout << "inside latest" << endl;
+    //cout << "inside latest" << endl;
     Json::Value latest = remainders[0];
     for (Json::Value::ArrayIndex i = 1; i != remainders.size(); i++) {
         int minDate = strcmp(latest["date"].asCString(), remainders[i]["date"].asCString());
@@ -176,6 +182,7 @@ void RemainderManagement::deleteOrModifyById(string id) {
 
             // write in remainders.json file
             writeRemaindersFromMap(remaindersMap);
+            break;
 
             // to delete or make changes in the recurrence remainders
             /*
@@ -206,3 +213,11 @@ void RemainderManagement::deleteOrModifyById(string id) {
     }
 }
 
+// checks if the remainder file is updated
+bool RemainderManagement::isFileUpdated(string oldContents) {
+    if (strcmp(oldContents.c_str(), readAFile(getAFileToRead()).c_str()) != 0) {
+        return true;
+    }
+
+    return false;
+}
