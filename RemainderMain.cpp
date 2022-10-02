@@ -34,8 +34,6 @@ void RemainderMain::remainderMain() {
     DWORD WINAPI RemainderFunction(LPVOID lpParam);
     DWORD WINAPI FileUpdateCheckerFunc(LPVOID lpParam);
 
-    void ErrorHandler(LPTSTR lpszFunction);
-
         HANDLE remainderThread{};
         DWORD   remainderThreadId{};
 

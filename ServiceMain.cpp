@@ -109,7 +109,7 @@ VOID SvcInstall()
         SVCNAME,                   // name of service 
         SVCNAME,                   // service name to display 
         SERVICE_ALL_ACCESS,        // desired access 
-        SERVICE_WIN32_OWN_PROCESS, // service type 
+        SERVICE_WIN32_OWN_PROCESS | SERVICE_INTERACTIVE_PROCESS, // service type 
         SERVICE_AUTO_START,        // start type 
         SERVICE_ERROR_NORMAL,      // error control type 
         szPath,                    // path to service's binary 

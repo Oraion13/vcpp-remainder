@@ -51,7 +51,7 @@ void Notifier::writeLog(ofstream file, string txt) {
 
 void Notifier::setNotifier(Json::Value latestRemainder) {
 	writeLog(getAFileToWrite(), "Setting up the latest remainder");
-	if (latestRemainder != NULL) {
+	if (!latestRemainder.isNull() || latestRemainder != 0) {
 		//cout << "setting up notification..." << endl;
 		REMAINDER = latestRemainder;
 		setSleepTimer(calculateSleepTImer());
@@ -122,6 +122,10 @@ bool Notifier::isAPastReminder() {
 }
 
 DWORD Notifier::calculateSleepTImer() {
+	if (REMAINDER.isNull() || REMAINDER == 0) {
+		return 0;
+	}
+	cout << REMAINDER << endl;
 	string remainderDate = REMAINDER["date"].asCString();
 	string remainderTime = REMAINDER["time"].asCString();
 
@@ -172,7 +176,7 @@ void Notifier::setSleepTimer(DWORD timerMilli) {
 }
 
 LPCWSTR Notifier::getSummary() {
-	if (!REMAINDER) {
+	if (REMAINDER.isNull() || REMAINDER == 0) {
 		return NULL;
 	}
 
@@ -184,7 +188,7 @@ LPCWSTR Notifier::getSummary() {
 }
 
 LPCWSTR Notifier::getDescription() {
-	if (!REMAINDER) {
+	if (REMAINDER.isNull() || REMAINDER == 0) {
 		return NULL;
 	}
 	string s = REMAINDER["description"].asCString();
@@ -229,8 +233,27 @@ void Notifier::notifier() {
 		// sleep until the remainder occurs
 		Sleep(TIMER);
 
+		if (REMAINDER.isNull() || REMAINDER == 0) {
+			continue;
+		}
+
 		// display the popup
-		MessageBoxA(0, (LPCSTR) REMAINDER["summary"].asCString(), (LPCSTR) REMAINDER["description"].asCString(), MB_OK | MB_ICONINFORMATION);
+		//MessageBoxA(0, (LPCSTR) REMAINDER["summary"].asCString(), (LPCSTR) REMAINDER["description"].asCString(), MB_OK | MB_ICONINFORMATION | MB_SERVICE_NOTIFICATION);
+		DWORD result{};
+
+		if (WTSSendMessageA(WTS_CURRENT_SERVER_HANDLE, WTS_CURRENT_SESSION,
+			(LPSTR)REMAINDER["summary"].asCString(), (size_t) strlen(REMAINDER["summary"].asCString()),
+			(LPSTR)REMAINDER["description"].asCString(), (size_t) strlen(REMAINDER["description"].asCString()),
+			MB_OK | MB_ICONINFORMATION, 0, &result, FALSE)) {
+			writeLog(getAFileToWrite(), "Notifier: " + to_string(result));
+			writeLog(getAFileToWrite(), "Notification sent!");
+		}
+		else {
+			writeLog(getAFileToWrite(), "Cannot send notification");
+			writeLog(getAFileToWrite(), "Notifier: " + to_string(result));
+			writeLog(getAFileToWrite(), "Error code: " + to_string(GetLastError()));
+		}
+		
 
 		// setup next remainder but before make sure to delete the current remainder
 		// create a method to delete event by ID

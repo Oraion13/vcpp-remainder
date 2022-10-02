@@ -1,9 +1,15 @@
 #pragma once
+
 #include <iostream>
 #include <string>
 #include <Windows.h>
 #include <fstream>
 #include <chrono>
+#include <WtsApi32.h>
+#include <Winbase.h>
+
+#pragma comment(lib, "Wtsapi32.lib")
+#pragma comment(lib, "Userenv.lib")
 
 #include "json/json.h"
 #include "RemainderManagement.h"
