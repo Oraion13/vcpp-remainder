@@ -239,21 +239,51 @@ void Notifier::notifier() {
 
 		// display the popup
 		//MessageBoxA(0, (LPCSTR) REMAINDER["summary"].asCString(), (LPCSTR) REMAINDER["description"].asCString(), MB_OK | MB_ICONINFORMATION | MB_SERVICE_NOTIFICATION);
-		DWORD result{};
-
-		if (WTSSendMessageA(WTS_CURRENT_SERVER_HANDLE, WTS_CURRENT_SESSION,
-			(LPSTR)REMAINDER["summary"].asCString(), (size_t) strlen(REMAINDER["summary"].asCString()),
-			(LPSTR)REMAINDER["description"].asCString(), (size_t) strlen(REMAINDER["description"].asCString()),
-			MB_OK | MB_ICONINFORMATION, 0, &result, FALSE)) {
-			writeLog(getAFileToWrite(), "Notifier: " + to_string(result));
-			writeLog(getAFileToWrite(), "Notification sent!");
-		}
-		else {
-			writeLog(getAFileToWrite(), "Cannot send notification");
-			writeLog(getAFileToWrite(), "Notifier: " + to_string(result));
-			writeLog(getAFileToWrite(), "Error code: " + to_string(GetLastError()));
-		}
 		
+		//DWORD result{};
+		//if (WTSSendMessageA(WTS_CURRENT_SERVER_HANDLE, WTS_CURRENT_SESSION,
+		//	(LPSTR)REMAINDER["summary"].asCString(), (size_t) strlen(REMAINDER["summary"].asCString()),
+		//	(LPSTR)REMAINDER["description"].asCString(), (size_t) strlen(REMAINDER["description"].asCString()),
+		//	MB_OK | MB_ICONINFORMATION, 0, &result, FALSE)) {
+		//	writeLog(getAFileToWrite(), "Notifier: " + to_string(result));
+		//	writeLog(getAFileToWrite(), "Notification sent!");
+		//}
+		//else {
+		//	writeLog(getAFileToWrite(), "Cannot send notification");
+		//	writeLog(getAFileToWrite(), "Notifier: " + to_string(result));
+		//	writeLog(getAFileToWrite(), "Error code: " + to_string(GetLastError()));
+		//}
+		// additional information
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+
+		// set the size of the structures
+		ZeroMemory(&si, sizeof(si));
+		si.cb = sizeof(si);
+		ZeroMemory(&pi, sizeof(pi));
+
+		char szcmd[200];
+		sprintf_s(szcmd, 200, "%s %s", REMAINDER["summary"].asCString(), REMAINDER["description"].asCString());
+
+		char execPath[200];
+		sprintf_s(execPath, 200, "%s", "C:\\CustomRemainder\\Notifier.exe");
+
+		// start the program up
+		CreateProcess((LPWSTR) execPath,   // the path
+			(LPWSTR) szcmd,        // Command line
+			NULL,           // Process handle not inheritable
+			NULL,           // Thread handle not inheritable
+			FALSE,          // Set handle inheritance to FALSE
+			0,              // No creation flags
+			NULL,           // Use parent's environment block
+			NULL,           // Use parent's starting directory 
+			&si,            // Pointer to STARTUPINFO structure
+			&pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
+		);
+		// Close process and thread handles.
+		WaitForSingleObject(pi.hProcess, INFINITE);
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
 
 		// setup next remainder but before make sure to delete the current remainder
 		// create a method to delete event by ID
