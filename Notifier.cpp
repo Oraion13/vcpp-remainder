@@ -218,7 +218,7 @@ void Notifier::notifier() {
 			writeLog(getAFileToWrite(), "No remainder present, checking for a remainder");
 			setNotifier(remainderManagement->getLatestRemainder());
 			// if an empty array of remainder is present, method will wait until a new remainder is added
-			while ((REMAINDER.isNull() || REMAINDER == 0) && !FLAG) {
+			while ((REMAINDER.isNull() || REMAINDER == 0) && !FLAG && !STOP_FLAG) {
 				writeLog(getAFileToWrite(), "Waiting for a new remainder...");
 				Sleep(10000);
 			}
@@ -298,15 +298,18 @@ void Notifier::notifier() {
 		//CloseHandle(pi.hThread);
 
 		// ------------------------------------------------------------------------------------
-		/*string privilage = "runas";
-		string execPath = "Notifier.exe";
-		string cmd = REMAINDER["summary"].asCString();
-		cmd.append(" ");
-		cmd.append(REMAINDER["description"].asCString());
+		//string str = REMAINDER["summary"].asCString();
+		//str.append(" ");
+		//str.append(REMAINDER["description"].asCString());
+		//const wchar_t* privilage = L"open";
+		//const wchar_t* execPath = L"C:\\CustomRemainder\\Notifier.exe";
 
-		HINSTANCE result = ShellExecuteW(NULL, (LPCWSTR) privilage.c_str(), (LPCWSTR)execPath.c_str(), (LPCWSTR)cmd.c_str(), NULL, SW_SHOWNORMAL);
-		cout << result << endl;
-		writeLog(getAFileToWrite(), "Process code: " + to_string(GetLastError()));*/
+		//wstring widestr = std::wstring(str.begin(), str.end());
+		//const wchar_t* cmd = widestr.c_str();
+
+		//HINSTANCE result = ShellExecuteW(NULL, (LPCWSTR) privilage, (LPCWSTR)execPath, (LPCWSTR)cmd, NULL, SW_SHOWNORMAL);
+		//cout << result << endl;
+		//writeLog(getAFileToWrite(), "Process code: " + to_string(GetLastError()));
 
 		// -------------------------------------------------------------------------------------
 
@@ -318,10 +321,6 @@ void Notifier::notifier() {
 
 		wstring widestr = std::wstring(str.begin(), str.end());
 		const wchar_t* cmd = widestr.c_str();
-		//string execPath = "C:\\CustomRemainder\\Notifier.exe";
-		//string cmd = REMAINDER["summary"].asCString();
-		//cmd.append(" ");
-		//cmd.append(REMAINDER["description"].asCString());
 
 		SHELLEXECUTEINFO shExInfo = { 0 };
 		shExInfo.cbSize = sizeof(shExInfo);
@@ -331,8 +330,10 @@ void Notifier::notifier() {
 		shExInfo.lpFile = (LPCWSTR)execPath;       // Application to start    
 		shExInfo.lpParameters = (LPCWSTR) cmd;                  // Additional parameters
 		shExInfo.lpDirectory = 0;
-		shExInfo.nShow = SW_HIDE;
+		shExInfo.nShow = SW_SHOW;
 		shExInfo.hInstApp = 0;
+
+		AllowSetForegroundWindow(ASFW_ANY);
 
 		if (ShellExecuteEx(&shExInfo))
 		{
@@ -342,7 +343,7 @@ void Notifier::notifier() {
 		}
 		else {
 			writeLog(getAFileToWrite(), "Cannot start the notifier process!");
-			//	writeLog(getAFileToWrite(), "Error: " + GetLastError());
+			writeLog(getAFileToWrite(), "Error: " + GetLastError());
 		}
 
 		// -------------------------------------------------------------------------------------
