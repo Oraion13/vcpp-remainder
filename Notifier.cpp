@@ -237,9 +237,11 @@ void Notifier::notifier() {
 			continue;
 		}
 
+		// -------------------------------------------------------------------------
 		// display the popup
 		//MessageBoxA(0, (LPCSTR) REMAINDER["summary"].asCString(), (LPCSTR) REMAINDER["description"].asCString(), MB_OK | MB_ICONINFORMATION | MB_SERVICE_NOTIFICATION);
 		
+		// -------------------------------------------------------------------------
 		//DWORD result{};
 		//if (WTSSendMessageA(WTS_CURRENT_SERVER_HANDLE, WTS_CURRENT_SESSION,
 		//	(LPSTR)REMAINDER["summary"].asCString(), (size_t) strlen(REMAINDER["summary"].asCString()),
@@ -253,44 +255,103 @@ void Notifier::notifier() {
 		//	writeLog(getAFileToWrite(), "Notifier: " + to_string(result));
 		//	writeLog(getAFileToWrite(), "Error code: " + to_string(GetLastError()));
 		//}
-		// additional information
-		STARTUPINFO si;
-		PROCESS_INFORMATION pi;
+		
+		// -------------------------------------------------------------------------
+		//// additional information
+		//STARTUPINFO si;
+		//PROCESS_INFORMATION pi;
 
-		// set the size of the structures
-		ZeroMemory(&si, sizeof(si));
-		si.cb = sizeof(si);
-		ZeroMemory(&pi, sizeof(pi));
+		//// set the size of the structures
+		//ZeroMemory(&si, sizeof(si));
+		//si.cb = sizeof(si);
+		//ZeroMemory(&pi, sizeof(pi));
 
-		char szcmd[200];
-		sprintf_s(szcmd, 200, "%s %s", REMAINDER["summary"].asCString(), REMAINDER["description"].asCString());
+		//string cmd = REMAINDER["summary"].asCString();
+		//cmd.append(" ");
+		//cmd.append(REMAINDER["description"].asCString());
+		//const char* execPath = "C:\\CustomRemainder\\Notifier.exe";
 
-		char execPath[200];
-		sprintf_s(execPath, 200, "%s", "C:\\CustomRemainder\\Notifier.exe");
+		////sprintf_s(szcmd, 200, "%s %s", REMAINDER["summary"].asCString(), REMAINDER["description"].asCString());
 
-		// start the program up
-		CreateProcess((LPWSTR) execPath,   // the path
-			(LPWSTR) szcmd,        // Command line
-			NULL,           // Process handle not inheritable
-			NULL,           // Thread handle not inheritable
-			FALSE,          // Set handle inheritance to FALSE
-			0,              // No creation flags
-			NULL,           // Use parent's environment block
-			NULL,           // Use parent's starting directory 
-			&si,            // Pointer to STARTUPINFO structure
-			&pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
-		);
-		// Close process and thread handles.
-		WaitForSingleObject(pi.hProcess, INFINITE);
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
+		//// start the program up
+		//if (CreateProcess((LPCWSTR) execPath,   // the path
+		//	(LPWSTR) wstring(cmd.begin(), cmd.end()).c_str(),        // Command line
+		//	NULL,           // Process handle not inheritable
+		//	NULL,           // Thread handle not inheritable
+		//	FALSE,          // Set handle inheritance to FALSE
+		//	0,              // No creation flags
+		//	NULL,           // Use parent's environment block
+		//	NULL,           // Use parent's starting directory 
+		//	&si,            // Pointer to STARTUPINFO structure
+		//	&pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
+		//)) {
+		//	writeLog(getAFileToWrite(), "Process Started!");
+		//}
+		//else {
+		//	writeLog(getAFileToWrite(), "Cannot start the notifier process!");
+		//	writeLog(getAFileToWrite(), "Error: " + GetLastError());
+		//}
+		//
+		//// Close process and thread handles.
+		//WaitForSingleObject(pi.hProcess, INFINITE);
+		//CloseHandle(pi.hProcess);
+		//CloseHandle(pi.hThread);
 
+		// ------------------------------------------------------------------------------------
+		/*string privilage = "runas";
+		string execPath = "Notifier.exe";
+		string cmd = REMAINDER["summary"].asCString();
+		cmd.append(" ");
+		cmd.append(REMAINDER["description"].asCString());
+
+		HINSTANCE result = ShellExecuteW(NULL, (LPCWSTR) privilage.c_str(), (LPCWSTR)execPath.c_str(), (LPCWSTR)cmd.c_str(), NULL, SW_SHOWNORMAL);
+		cout << result << endl;
+		writeLog(getAFileToWrite(), "Process code: " + to_string(GetLastError()));*/
+
+		// -------------------------------------------------------------------------------------
+
+		string str = REMAINDER["summary"].asCString();
+		str.append(" ");
+		str.append(REMAINDER["description"].asCString());
+		const wchar_t* privilage = L"runas";
+		const wchar_t* execPath = L"C:\\CustomRemainder\\Notifier.exe";
+
+		wstring widestr = std::wstring(str.begin(), str.end());
+		const wchar_t* cmd = widestr.c_str();
+		//string execPath = "C:\\CustomRemainder\\Notifier.exe";
+		//string cmd = REMAINDER["summary"].asCString();
+		//cmd.append(" ");
+		//cmd.append(REMAINDER["description"].asCString());
+
+		SHELLEXECUTEINFO shExInfo = { 0 };
+		shExInfo.cbSize = sizeof(shExInfo);
+		shExInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+		shExInfo.hwnd = 0;
+		shExInfo.lpVerb = (LPCWSTR) privilage;                // Operation to perform
+		shExInfo.lpFile = (LPCWSTR)execPath;       // Application to start    
+		shExInfo.lpParameters = (LPCWSTR) cmd;                  // Additional parameters
+		shExInfo.lpDirectory = 0;
+		shExInfo.nShow = SW_HIDE;
+		shExInfo.hInstApp = 0;
+
+		if (ShellExecuteEx(&shExInfo))
+		{
+			writeLog(getAFileToWrite(), "Process Started!");
+			WaitForSingleObject(shExInfo.hProcess, 30);
+			CloseHandle(shExInfo.hProcess);
+		}
+		else {
+			writeLog(getAFileToWrite(), "Cannot start the notifier process!");
+			//	writeLog(getAFileToWrite(), "Error: " + GetLastError());
+		}
+
+		// -------------------------------------------------------------------------------------
 		// setup next remainder but before make sure to delete the current remainder
 		// create a method to delete event by ID
 		remainderManagement->deleteOrModifyById(REMAINDER["id"].asCString());
 
 		REMAINDER = NULL;
-		writeLog(getAFileToWrite(), "Success!");
+		writeLog(getAFileToWrite(), "Notified!");
 	}
 }
 

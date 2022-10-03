@@ -29,7 +29,7 @@
 
 // -----------------------------------------------------------------------------------------------------------
 
-void main() {
+void RemainderMain::remainderMain() {
 
     DWORD WINAPI RemainderFunction(LPVOID lpParam);
     DWORD WINAPI FileUpdateCheckerFunc(LPVOID lpParam);
